@@ -28,9 +28,9 @@
 | description | string | — |
 | amount | decimal | — |
 | status | string | — |
-| budgetItemId | int | FK → BudgetItem.id |
-| createdByUserId | int | FK → User.id |
-| assigneeUserId | int? | FK → User.id, может быть пустым |
+| budgetItemId | int | FK -> BudgetItem.id |
+| createdByUserId | int | FK -> User.id |
+| assigneeUserId | int? | FK -> User.id, может быть пустым |
 
 ### 2.3. User (пользователь)
 
