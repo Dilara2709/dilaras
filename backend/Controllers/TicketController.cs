@@ -51,7 +51,7 @@ public class TicketsController : ControllerBase
         {
             _logger.LogError(ex,
                 "CreateTicket failed; SiteId={SiteId}; error={Error}",
-                request.SiteId, ex.GetType().Name);
+                request.CarriageId, ex.GetType().Name);
             return Problem(statusCode: 500, title: "Не удалось обработать запрос");
         }
     }
@@ -96,7 +96,7 @@ public class TicketsController : ControllerBase
         Title = t.Title,
         Description = t.Description,
         Status = t.Status,
-        SiteId = t.SiteId,
+        CarriageId = t.CarriageId,
         CreatedByUserId = t.CreatedByUserId,
         AssigneeUserId = t.AssigneeUserId
     };

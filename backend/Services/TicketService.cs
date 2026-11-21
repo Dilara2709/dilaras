@@ -20,7 +20,7 @@ public class TicketService : ITicketService
             Number = $"TMP-{_nextId}",  // как в методичке
             Title = request.Title.Trim(),
             Description = request.Description.Trim(),
-            SiteId = request.SiteId,
+            CarriageId = request.CarriageId,
             Status = "New",
             CreatedByUserId = userId,
             AssigneeUserId = null
