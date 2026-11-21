@@ -8,7 +8,7 @@ public class Ticket
     public string Description { get; set; } = "";
     public string Status { get; set; } = "New";
     public int CarriageId { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public int CreatedByUserId { get; set; }
-    public int? AssigneeUserId { get; set; }
+    public int? AssigneeUserId { get; set; }       // nullable
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
