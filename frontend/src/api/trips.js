@@ -8,6 +8,9 @@ const baseUrl = (
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
 ).replace(/\/+$/, '')
 
+// Идентификатор пользователя для учебного режима
+const userId = import.meta.env.VITE_USER_ID || '1'
+
 // Обработка ошибок API
 async function handleError(response, fallbackMessage) {
   const errData = await response.json().catch(() => ({}))
@@ -69,7 +72,8 @@ export async function createTrip(body) {
   const response = await fetch(`${baseUrl}/api/trips`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-User-Id': userId
     },
     body: JSON.stringify(body)
   })

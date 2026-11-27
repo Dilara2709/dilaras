@@ -76,6 +76,16 @@
         "tags": [
           "Trip"
         ],
+        "parameters": [
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {

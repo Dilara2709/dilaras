@@ -58,13 +58,21 @@ public class TripController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), 400)]
     [ProducesResponseType(typeof(ProblemDetails), 500)]
     public ActionResult<TripResponse> Create(
-        [FromBody] CreateTripRequest request)
+        [FromBody] CreateTripRequest request,
+        [FromHeader(Name = "X-User-Id")] int? userId)
     {
+        if (!userId.HasValue || userId.Value <= 0)
+        {
+            return Problem(
+                statusCode: 400,
+                title: "Некорректные данные",
+                detail: "Укажите положительный X-User-Id");
+        }
+
         try
         {
-            // Временный идентификатор пользователя.
-            // Авторизация реализуется отдельно.
-            var created = _service.Create(request, userId: 1);
+            var created = _service.Create(
+                request, userId.Value);
 
             return CreatedAtAction(
                 nameof(GetById),
@@ -81,8 +89,8 @@ public class TripController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                "CreateTrip failed; CarriageId={CarriageId}",
-                request.CarriageId);
+                "CreateTrip failed; CarriageId={CarriageId}; UserId={UserId}",
+                request.CarriageId, userId.Value);
 
             return Problem(
                 statusCode: 500,
