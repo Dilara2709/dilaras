@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import TripTable from '/Users/acer/Desktop/dilaras/frontend/src/components/TrIpTable.vue'
+
+import TripTable from '../components/TripTable.vue'
 import { items, carriages, passengers, loadTrips } from '../tripsStore.js'
 
 // 'loading' | 'empty' | 'data' | 'error'

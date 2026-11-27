@@ -8,14 +8,14 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     // Таблицы, которые ты видишь в C#-коде
-    public DbSet<Ticket> Tickets => Set<Ticket>();
+    public DbSet<Trip> Trips => Set<Trip>();
     public DbSet<Carriage> Carriages => Set<Carriage>();
     public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Главный объект
-        modelBuilder.Entity<Ticket>(entity =>
+        modelBuilder.Entity<Trip>(entity =>
         {
             entity.ToTable("trips");                 // имя таблицы в PostgreSQL
             entity.HasKey(e => e.Id);

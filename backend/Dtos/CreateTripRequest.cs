@@ -1,8 +1,9 @@
+
 using System.ComponentModel.DataAnnotations;
 
 namespace backend.Dtos;
 
-public class CreateTicketRequest
+public class CreateTripRequest
 {
     [Required(ErrorMessage = "Тема обязательна")]
     [StringLength(80, MinimumLength = 5, ErrorMessage = "Тема: от 5 до 80 символов")]

@@ -1,25 +1,53 @@
+
 import { mockGetTrips, mockCreateTrip } from './mockTrips.js'
 
-// Пока сервера нет — используем mock
-const USE_MOCK = true
+// Используем реальный backend
+const USE_MOCK = false
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL
+const baseUrl = (
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+).replace(/\/+$/, '')
+
+// Обработка ошибок API
+async function handleError(response, fallbackMessage) {
+  const errData = await response.json().catch(() => ({}))
+
+  const validationErrors = errData.errors
+    ? Object.values(errData.errors).flat().join(' ')
+    : ''
+
+  throw {
+    status: response.status,
+    message:
+      errData.detail ||
+      validationErrors ||
+      errData.message ||
+      errData.title ||
+      fallbackMessage
+  }
+}
 
 // GET /api/trips — получить список
 export async function getTrips() {
   if (USE_MOCK) {
     const mock = await mockGetTrips()
+
     if (!mock.ok) {
-      throw { status: mock.status, message: mock.data.message || 'Ошибка сервера' }
+      throw {
+        status: mock.status,
+        message: mock.data.message || 'Ошибка сервера'
+      }
     }
+
     return mock.data
   }
 
-  // Настоящий fetch
   const response = await fetch(`${baseUrl}/api/trips`)
+
   if (!response.ok) {
-    throw { status: response.status, message: 'Не удалось загрузить список' }
+    await handleError(response, 'Не удалось загрузить список')
   }
+
   return await response.json()
 }
 
@@ -27,20 +55,28 @@ export async function getTrips() {
 export async function createTrip(body) {
   if (USE_MOCK) {
     const mock = await mockCreateTrip(body)
+
     if (!mock.ok) {
-      throw { status: mock.status, message: mock.data.message || 'Ошибка сервера' }
+      throw {
+        status: mock.status,
+        message: mock.data.message || 'Ошибка сервера'
+      }
     }
+
     return mock.data
   }
 
   const response = await fetch(`${baseUrl}/api/trips`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify(body)
   })
+
   if (!response.ok) {
-    const errData = await response.json().catch(() => ({}))
-    throw { status: response.status, message: errData.message || 'Не удалось создать' }
+    await handleError(response, 'Не удалось создать поездку')
   }
+
   return await response.json()
 }

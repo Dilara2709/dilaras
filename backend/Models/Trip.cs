@@ -1,6 +1,6 @@
 namespace backend.Models;
 
-public class Ticket
+public class Trip
 {
     public int Id { get; set; }
     public string Number { get; set; } = "";

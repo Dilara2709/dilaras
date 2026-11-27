@@ -1,5 +1,5 @@
+
 <script setup>
-// Объявляем props: таблица ждёт массив items
 defineProps({
   items: {
     type: Array,
@@ -15,20 +15,31 @@ defineProps({
   }
 })
 
-// Функция: получить название вагона по id
+// Получение названия вагона
 function carriageName(id, carriages) {
   const found = carriages.find(c => c.id === id)
   return found ? found.name : '—'
 }
 
+// Определение тихого вагона по его типу
 function isQuietCarriage(id, carriages) {
   const found = carriages.find(c => c.id === id)
-  return found ? found.isQuiet : false
+  return found?.type === 'quiet'
 }
 
-function passengerName(id, passengers) {
-  const found = passengers.find(p => p.id === id)
-  return found ? found.fullName : '—'
+// Получение имени назначенного проводника
+function conductorName(id, users) {
+  if (id == null) return '—'
+
+  const found = users.find(u => u.id === id)
+
+  if (!found) return `Пользователь #${id}`
+
+  if (found.role !== 'conductor') {
+    return 'Некорректное назначение'
+  }
+
+  return found.fullName
 }
 </script>
 
@@ -36,21 +47,22 @@ function passengerName(id, passengers) {
   <table>
     <thead>
       <tr>
-        <th>Номер поезда</th>
+        <th>Номер поездки</th>
         <th>Маршрут</th>
         <th>Вагон</th>
         <th>Тихий</th>
-        <th>Исполнитель</th>
+        <th>Проводник</th>
         <th>Статус</th>
       </tr>
     </thead>
+
     <tbody>
       <tr v-for="item in items" :key="item.id">
         <td>{{ item.number }}</td>
         <td>{{ item.title }}</td>
         <td>{{ carriageName(item.carriageId, carriages) }}</td>
         <td>{{ isQuietCarriage(item.carriageId, carriages) ? 'Да' : 'Нет' }}</td>
-        <td>{{ item.assigneeUserId ? passengerName(item.assigneeUserId, passengers) : '—' }}</td>
+        <td>{{ conductorName(item.assigneeUserId, passengers) }}</td>
         <td>{{ item.status }}</td>
       </tr>
     </tbody>
