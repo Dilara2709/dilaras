@@ -48,7 +48,7 @@ namespace backend.Migrations
                     b.ToTable("carriages", (string)null);
                 });
 
-            modelBuilder.Entity("backend.Models.Ticket", b =>
+            modelBuilder.Entity("backend.Models.Trip", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,8 +66,10 @@ namespace backend.Migrations
                         .HasColumnName("carriage_id");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<int>("CreatedByUserId")
                         .HasColumnType("integer")
@@ -81,7 +83,8 @@ namespace backend.Migrations
 
                     b.Property<string>("Number")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("number");
 
                     b.Property<string>("Status")
@@ -102,9 +105,20 @@ namespace backend.Migrations
 
                     b.HasIndex("CarriageId");
 
+                    b.HasIndex("CreatedAt")
+                        .IsDescending();
+
                     b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("trips", (string)null);
+                    b.HasIndex("Number")
+                        .IsUnique();
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("trips", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_trips_status", "status IN ('New', 'InProgress', 'Closed', 'Cancelled')");
+                        });
                 });
 
             modelBuilder.Entity("backend.Models.User", b =>
@@ -136,25 +150,32 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("users", (string)null);
+                    b.HasIndex("Login")
+                        .IsUnique();
+
+                    b.ToTable("users", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_users_role", "role IN ('passenger', 'conductor', 'admin')");
+                        });
                 });
 
-            modelBuilder.Entity("backend.Models.Ticket", b =>
+            modelBuilder.Entity("backend.Models.Trip", b =>
                 {
                     b.HasOne("backend.Models.User", null)
                         .WithMany()
-                        .HasForeignKey("AssigneeUserId");
+                        .HasForeignKey("AssigneeUserId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("backend.Models.Carriage", null)
                         .WithMany()
                         .HasForeignKey("CarriageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("backend.Models.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

@@ -60,7 +60,7 @@ public class TripService : ITripService
 
         var trip = new Trip
         {
-            Number = $"TMP-{DateTime.UtcNow.Ticks}",
+            Number = $"TMP-{DateTime.UtcNow.Ticks:X16}",
             Title = title,
             Description = description,
             CarriageId = request.CarriageId,
