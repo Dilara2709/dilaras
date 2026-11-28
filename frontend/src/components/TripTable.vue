@@ -21,7 +21,7 @@ function carriageName(id, carriages) {
   return found ? found.name : '—'
 }
 
-// Определение тихого вагона по его типу
+// Определение тихого вагона
 function isQuietCarriage(id, carriages) {
   const found = carriages.find(c => c.id === id)
   return found?.type === 'quiet'
@@ -41,35 +41,66 @@ function conductorName(id, users) {
 
   return found.fullName
 }
+
+// Форматирование даты создания
+function formatDate(value) {
+  if (!value) return '—'
+
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return '—'
+  }
+
+  return date.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
 </script>
 
 <template>
-  <table>
-    <thead>
-      <tr>
-        <th>Номер поездки</th>
-        <th>Маршрут</th>
-        <th>Вагон</th>
-        <th>Тихий</th>
-        <th>Проводник</th>
-        <th>Статус</th>
-      </tr>
-    </thead>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Номер поездки</th>
+          <th>Маршрут</th>
+          <th>Вагон</th>
+          <th>Тихий</th>
+          <th>Проводник</th>
+          <th>Статус</th>
+          <th>Дата создания</th>
+        </tr>
+      </thead>
 
-    <tbody>
-      <tr v-for="item in items" :key="item.id">
-        <td>{{ item.number }}</td>
-        <td>{{ item.title }}</td>
-        <td>{{ carriageName(item.carriageId, carriages) }}</td>
-        <td>{{ isQuietCarriage(item.carriageId, carriages) ? 'Да' : 'Нет' }}</td>
-        <td>{{ conductorName(item.assigneeUserId, passengers) }}</td>
-        <td>{{ item.status }}</td>
-      </tr>
-    </tbody>
-  </table>
+      <tbody>
+        <tr v-for="item in items" :key="item.id">
+          <td>{{ item.number }}</td>
+          <td>{{ item.title }}</td>
+          <td>{{ carriageName(item.carriageId, carriages) }}</td>
+          <td>
+            {{ isQuietCarriage(item.carriageId, carriages) ? 'Да' : 'Нет' }}
+          </td>
+          <td>
+            {{ conductorName(item.assigneeUserId, passengers) }}
+          </td>
+          <td>{{ item.status }}</td>
+          <td>{{ formatDate(item.createdAt) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <style scoped>
+.table-wrapper {
+  overflow-x: auto;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;

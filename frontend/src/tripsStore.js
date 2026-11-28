@@ -29,10 +29,10 @@ export async function loadDictionaries() {
   passengers.value = usersData
 }
 
-// Загрузка поездок и справочников
-export async function loadTrips() {
+// Загрузка поездок с учётом фильтров
+export async function loadTrips(filters = {}) {
   const [data] = await Promise.all([
-    apiGetTrips(),
+    apiGetTrips(filters),
     loadDictionaries()
   ])
 

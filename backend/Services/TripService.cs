@@ -15,10 +15,42 @@ public class TripService : ITripService
         _db = db;
     }
 
-    public List<Trip> GetAll() =>
-        _db.Trips.AsNoTracking()
-            .OrderByDescending(t => t.CreatedAt)
-            .ToList();
+    public List<Trip> GetAll(
+    string? status = null,
+    int? carriageId = null)
+{
+    var query = _db.Trips.AsNoTracking();
+
+    if (!string.IsNullOrWhiteSpace(status))
+    {
+        if (status != "New" &&
+            status != "InProgress" &&
+            status != "Closed" &&
+            status != "Cancelled")
+        {
+            throw new ArgumentException(
+                "Недопустимый статус поездки.");
+        }
+
+        query = query.Where(t => t.Status == status);
+    }
+
+    if (carriageId.HasValue)
+    {
+        if (carriageId.Value <= 0)
+        {
+            throw new ArgumentException(
+                "CarriageId должен быть больше 0.");
+        }
+
+        query = query.Where(
+            t => t.CarriageId == carriageId.Value);
+    }
+
+    return query
+        .OrderByDescending(t => t.CreatedAt)
+        .ToList();
+}
 
     public Trip? GetById(int id) =>
         _db.Trips.AsNoTracking()

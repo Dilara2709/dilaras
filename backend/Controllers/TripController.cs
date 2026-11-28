@@ -22,18 +22,39 @@ public class TripController : ControllerBase
         _logger = logger;
     }
 
-    // GET /api/trips
-    [HttpGet]
-    [ProducesResponseType(typeof(List<TripResponse>), 200)]
-    [ProducesResponseType(typeof(ProblemDetails), 500)]
-    public ActionResult<List<TripResponse>> GetAll()
+    // GET /api/trips?status=New&carriageId=1
+[HttpGet]
+[ProducesResponseType(typeof(List<TripResponse>), 200)]
+[ProducesResponseType(typeof(ProblemDetails), 400)]
+[ProducesResponseType(typeof(ProblemDetails), 500)]
+public ActionResult<List<TripResponse>> GetAll(
+    [FromQuery] string? status,
+    [FromQuery] int? carriageId)
+{
+    try
     {
-        var items = _service.GetAll()
+        var items = _service.GetAll(status, carriageId)
             .Select(ToResponse)
             .ToList();
 
         return Ok(items);
     }
+    catch (ArgumentException ex)
+    {
+        return Problem(
+            statusCode: 400,
+            title: "Некорректные параметры фильтрации",
+            detail: ex.Message);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "GetAll trips failed");
+
+        return Problem(
+            statusCode: 500,
+            title: "Не удалось получить список поездок");
+    }
+}
 
     // GET /api/trips/{id}
     [HttpGet("{id}")]
@@ -205,14 +226,15 @@ public class TripController : ControllerBase
     }
 
     private static TripResponse ToResponse(Trip t) => new()
-    {
-        Id = t.Id,
-        Number = t.Number,
-        Title = t.Title,
-        Description = t.Description,
-        Status = t.Status,
-        CarriageId = t.CarriageId,
-        CreatedByUserId = t.CreatedByUserId,
-        AssigneeUserId = t.AssigneeUserId
-    };
+{
+    Id = t.Id,
+    Number = t.Number,
+    Title = t.Title,
+    Description = t.Description,
+    Status = t.Status,
+    CarriageId = t.CarriageId,
+    CreatedByUserId = t.CreatedByUserId,
+    AssigneeUserId = t.AssigneeUserId,
+    CreatedAt = t.CreatedAt
+};
 }

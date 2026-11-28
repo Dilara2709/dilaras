@@ -30,8 +30,8 @@ async function handleError(response, fallbackMessage) {
   }
 }
 
-// GET /api/trips — получить список
-export async function getTrips() {
+// GET /api/trips — получение списка с фильтрами
+export async function getTrips(filters = {}) {
   if (USE_MOCK) {
     const mock = await mockGetTrips()
 
@@ -42,10 +42,28 @@ export async function getTrips() {
       }
     }
 
-    return mock.data
+    return mock.data.filter(item =>
+      (!filters.status || item.status === filters.status) &&
+      (!filters.carriageId ||
+        item.carriageId === Number(filters.carriageId))
+    )
   }
 
-  const response = await fetch(`${baseUrl}/api/trips`)
+  const params = new URLSearchParams()
+
+  if (filters.status) {
+    params.set('status', filters.status)
+  }
+
+  if (filters.carriageId) {
+    params.set('carriageId', filters.carriageId)
+  }
+
+  const query = params.toString()
+
+  const url = `${baseUrl}/api/trips${query ? `?${query}` : ''}`
+
+  const response = await fetch(url)
 
   if (!response.ok) {
     await handleError(response, 'Не удалось загрузить список')

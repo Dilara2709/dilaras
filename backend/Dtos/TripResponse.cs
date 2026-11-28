@@ -10,4 +10,5 @@ public class TripResponse
     public int CarriageId { get; set; }
     public int CreatedByUserId { get; set; }
     public int? AssigneeUserId { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
