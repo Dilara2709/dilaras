@@ -13,16 +13,59 @@
 - Frontend: Vue 3, Vite
 - База данных: PostgreSQL
 - Документация API: Swagger
+- ORM: Entity Framework Core
+
+## Настройка базы данных
+
+Необходимы .NET 8 SDK и PostgreSQL.
+
+Создайте базу данных `course_trips` в PostgreSQL.
+
+Пример строки подключения находится в файле
+`backend/appsettings.Development.json.example`.
+
+Для безопасного хранения строки подключения используйте User Secrets.
+
+В терминале из корневой папки проекта выполнить:
+
+```bash
+cd backend
+dotnet user-secrets set "ConnectionStrings:Default" "Host=localhost;Port=5432;Database=course_trips;Username=postgres;Password=YOUR_PASSWORD"
+```
+
+Вместо YOUR_PASSWORD необходимо указать свой пароль PostgreSQL.
+
+Настоящий пароль не должен храниться в GitHub.
+
+## Применение миграций
+
+При необходимости установите инструмент Entity Framework Core:
+
+```bash
+dotnet tool install --global dotnet-ef --version 8.0.11
+```
+
+В папке backend выполните:
+
+```bash
+dotnet restore
+dotnet ef database update
+```
+
+Миграции создают и обновляют таблицы trips, carriages и users, внешние ключи, ограничения CHECK, уникальные индексы и индекс по статусу поездки.
+
+Для заполнения новой базы учебными данными используйте файл `db/seed.sql`.
+
+Файл `db/schema.sql` является справочным описанием структуры базы данных. При использовании миграций запускать его не требуется.
 
 ## Запуск backend
-
-Необходимы .NET 8 SDK и PostgreSQL с настроенной строкой подключения `ConnectionStrings:Default`.
 
 В терминале из корневой папки проекта выполнить:
 
 ```bash
 cd backend
 dotnet restore
+dotnet ef database update
 dotnet run
 ```
 
@@ -88,6 +131,20 @@ Frontend получает идентификатор из переменной
 - Допустимые переходы: New → InProgress → Closed, New → Cancelled.
 - Проверка бизнес-правил выполняется в сервисном слое TripService.
 - При нарушении правил перехода между статусами API возвращает 409 Conflict.
+
+## Проверка сохранения данных после перезапуска
+
+1. Запустить backend командой `dotnet run`.
+2. Открыть Swagger по адресу http://localhost:5000/swagger/index.html.
+3. Выполнить POST /api/trips с заголовком X-User-Id и корректными данными поездки.
+4. Убедиться, что сервер вернул 201 Created.
+5. Запомнить идентификатор созданной поездки.
+6. Остановить backend сочетанием клавиш Ctrl+C.
+7. Повторно запустить backend командой `dotnet run`.
+8. Выполнить GET /api/trips/{id}, указав сохранённый идентификатор.
+9. Убедиться, что сервер возвращает 200 OK и данные ранее созданной поездки.
+
+Ожидаемый результат: данные сохраняются после перезапуска приложения, поскольку хранятся в PostgreSQL, а не в оперативной памяти.
 
 ## Сборка проекта
 
